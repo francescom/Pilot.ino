@@ -12,26 +12,22 @@ To add commands modify interpretCommand() to parse your new xyz command and then
 
 Available "SCL" ("Sketch Control Language") commands (you can add more to the sketch):
 
-dir <in or out> <pin>: set input or output direction for a pin
-
+dir &lt;in or out> &lt;pin>: set input or output direction for a pin
 dir i 12
 dir out 10
-
 (any string beginning with i will be for input, anything else will be output)
 
 
-get <analog or digital> <pin>: get current pin value
-
+get &lt;analog or digital> &lt;pin>: get current pin value
 get a A0
 get d 12
-
 (writes to serial the value returned, 0/1 for digital, 0-1023 for analog)
 
-set <analog or digital> <pin> <value>: set pin value to <value>
+set &lt;analog or digital> &lt;pin> &lt;value>: set pin value to &lt;value>
 set a A0 128
 set a A1 0x7a
 set d 10 hi
-(for <value> use hi or lo, or a numeric value for analog)
+(for &lt;value> use hi or lo, or a numeric value for analog)
 
 Use numeric values for pins, or you can use A0-An strings for analog, will be converted to numeric
 
