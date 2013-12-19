@@ -1,36 +1,36 @@
 // Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port
 //
 // Original version for UDOO board by Francesco Munafo'
-// 
+//
 // The idea is to generically control the Arduino with some simple "Sketch Control Language"
 // much like an SQL query controls (reads/writes) a database.
 // We may slowly add commands when needed, to cover all possible interactions.
-// 
+//
 // To add commands modify interpretCommand() to parse your new xyz command and then add a doXyz() function with the correct params
 //
 //
-// 
+//
 // Available "SCL" ("Sketch Control Language") commands (you can add more to the sketch):
-// 
+//
 // dir <in or out> <pin>: set input or output direction for a pin
-//      dir i 12
-//      dir out 10
-//     (any string beginning with i will be for input, anything else will be output)
-// 
-// 
+// dir i 12
+// dir out 10
+// (any string beginning with i will be for input, anything else will be output)
+//
+//
 // get <analog or digital> <pin>: get current pin value
-//      get a A0
-//      get d 12
-//     (writes to serial the value returned, 0/1 for digital, 0-1023 for analog)
-// 
+// get a A0
+// get d 12
+// (writes to serial the value returned, 0/1 for digital, 0-1023 for analog)
+//
 // set <analog or digital> <pin> <value>: set pin value to <value>
-//      set a A0 128
-//      set a A1 0x7a
-//      set d 10 hi
-//      (for <value> use hi or lo, or a numeric value for analog)
-// 
+// set a A0 128
+// set a A1 0x7a
+// set d 10 hi
+// (for <value> use hi or lo, or a numeric value for analog)
+//
 // Use numeric values for pins, or you can use A0-An strings for analog, will be converted to numeric
-// 
+//
 // Script options at the top of the script.
 //
 //
@@ -45,25 +45,19 @@
 // setCommand("cmdword",&commandFunction,"spv"); // adds command cmdword that calls function commandFunction() with string,pin,value params
 //
 // Contact me at francesco [A T] esurfers d o t com");
-// 
-
-
-
-
-
-///////////////////////
-////////////
-///////
-////     CONFIGURATION
 //
-//
+
+
 
 
 const boolean DEBUG=false;
-const int BUFFER_SIZE=255;
-const int FIRST_ANALOG_PIN=54;
+const char BUFFER_SIZE=255;
 const char CMD_SEP=' ';
-const int SERIAL_SPEED=115200;
+const char CMD_TERM1='\n';
+const char CMD_TERM2='\r';
+const char CMD_TERM3='|';
+const int SERIAL_SPEED=9600;
+const int FIRST_ANALOG_PIN=54; // A0
 
 
 
@@ -98,7 +92,7 @@ void setup() {
 void loop() {
   if(Serial.available()) {
     char inChar = (char)Serial.read();
-    if(inChar=='\n' || inChar=='\r') {
+    if(inChar==CMD_TERM1 || inChar==CMD_TERM2 || inChar==CMD_TERM3) {
       buffPtr=buff;
       if(DEBUG) {
         Serial.print("String: ");
@@ -108,6 +102,9 @@ void loop() {
     } else if(buffPtr<buff+MAX_BUF) {
       *buffPtr++=inChar;
       *(buffPtr+1)='\0';
+      if(DEBUG) {
+        Serial.print(inChar);
+      }
     }
     // Serial.print(buff);
   }  
@@ -224,7 +221,7 @@ void doVers() {
     }
     //*/
     
-    Serial.println("Arduino Remote Control - v 0.1 - a script to control the Arduino pins from a connected computer");
+    Serial.println("Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port");
 }
 
 void doHelp() {
@@ -235,7 +232,7 @@ void doHelp() {
     }
     //*/
     
-    Serial.println("Arduino Remote Control - v 0.1 - a script to control the Arduino pins from a connected computer via serial");
+    Serial.println("Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port");
     Serial.println("Original version for UDOO board by Francesco Munafo'");
     Serial.println("");
     Serial.println("Available commands (you can add more to the sketch):");
