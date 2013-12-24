@@ -1,0 +1,20 @@
+
+Pilot.ino How to
+
+
+1) check you have PHP installed
+
+2) using the Arduino IDE send the pilot.ino script to your Arduino board
+
+3) to run the example check that testpilot script is executable, from the folder containing testpilot:
+sudo chmod a+x ./testpilot
+
+4) edit testpilot to setup options, like php location at the top of the file if not /usr/bin/php or the speed and name of the serial port
+
+5) run testpilot
+
+sudo ./testpilot
+
+6) watch leds connected to pins 5-13 intermittently lighting, and value of sensor connected to analog A0 displayed to console.
+
+7) modify at your pleasure (like upload sensor value to a website instead of printing it)
