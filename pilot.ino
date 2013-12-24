@@ -47,14 +47,22 @@
 // Contact me at francesco [A T] esurfers d o t com");
 //
 
+
+
+
 const boolean DEBUG=false;
 const char BUFFER_SIZE=255;
 const char CMD_SEP=' ';
 const char CMD_TERM1='\n';
 const char CMD_TERM2='\r';
 const char CMD_TERM3='|';
+
+
 const int SERIAL_SPEED=57600;
 const int FIRST_ANALOG_PIN=54;
+
+const int SERIAL_SPEED=9600;
+const int FIRST_ANALOG_PIN=54; // A0
 
 
 
@@ -221,7 +229,7 @@ void doVers() {
     }
     //*/
     
-    Serial.println("Arduino Remote Control - v 0.1 - a script to control the Arduino pins from a connected computer");
+    Serial.println("Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port");
 }
 
 void doHelp() {
@@ -232,7 +240,7 @@ void doHelp() {
     }
     //*/
     
-    Serial.println("Arduino Remote Control - v 0.1 - a script to control the Arduino pins from a connected computer via serial");
+    Serial.println("Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port");
     Serial.println("Original version for UDOO board by Francesco Munafo'");
     Serial.println("");
     Serial.println("Available commands (you can add more to the sketch):");
