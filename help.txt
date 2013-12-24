@@ -7,7 +7,7 @@ Pilot.ino How to
 
 3) to run the example, make the testpilot script executable. In linux, from the folder containing testpilot:
 
-<code>sudo chmod a+x ./testpilot</code>
+    sudo chmod a+x ./testpilot
 
 4) to run the example, pilotino.php must be in the same folder as testpilot
 
@@ -17,11 +17,11 @@ Pilot.ino How to
 
 on linux/osx:
 
-sudo ./testpilot
+    sudo ./testpilot
 
 or you may launch php as a command:
 
-php testpilot
+    php testpilot
 
 
 7) watch leds connected to pins 5-13 intermittently lighting, and value of sensor connected to analog A0 displayed to console.
