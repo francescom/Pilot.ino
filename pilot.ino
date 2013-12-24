@@ -1,36 +1,36 @@
-// Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port
+// Arduino Pilot - v 0.1 - a script to control the Arduino pins from a connected computer via serial port with any scripting language
 //
 // Original version for UDOO board by Francesco Munafo'
-// 
+//
 // The idea is to generically control the Arduino with some simple "Sketch Control Language"
 // much like an SQL query controls (reads/writes) a database.
 // We may slowly add commands when needed, to cover all possible interactions.
-// 
+//
 // To add commands modify interpretCommand() to parse your new xyz command and then add a doXyz() function with the correct params
 //
 //
-// 
+//
 // Available "SCL" ("Sketch Control Language") commands (you can add more to the sketch):
-// 
+//
 // dir <in or out> <pin>: set input or output direction for a pin
-//      dir i 12
-//      dir out 10
-//     (any string beginning with i will be for input, anything else will be output)
-// 
-// 
+// dir i 12
+// dir out 10
+// (any string beginning with i will be for input, anything else will be output)
+//
+//
 // get <analog or digital> <pin>: get current pin value
-//      get a A0
-//      get d 12
-//     (writes to serial the value returned, 0/1 for digital, 0-1023 for analog)
-// 
+// get a A0
+// get d 12
+// (writes to serial the value returned, 0/1 for digital, 0-1023 for analog)
+//
 // set <analog or digital> <pin> <value>: set pin value to <value>
-//      set a A0 128
-//      set a A1 0x7a
-//      set d 10 hi
-//      (for <value> use hi or lo, or a numeric value for analog)
-// 
+// set a A0 128
+// set a A1 0x7a
+// set d 10 hi
+// (for <value> use hi or lo, or a numeric value for analog)
+//
 // Use numeric values for pins, or you can use A0-An strings for analog, will be converted to numeric
-// 
+//
 // Script options at the top of the script.
 //
 //
@@ -45,25 +45,16 @@
 // setCommand("cmdword",&commandFunction,"spv"); // adds command cmdword that calls function commandFunction() with string,pin,value params
 //
 // Contact me at francesco [A T] esurfers d o t com");
-// 
-
-
-
-
-
-///////////////////////
-////////////
-///////
-////     CONFIGURATION
 //
-//
-
 
 const boolean DEBUG=false;
-const int BUFFER_SIZE=255;
-const int FIRST_ANALOG_PIN=54;
+const char BUFFER_SIZE=255;
 const char CMD_SEP=' ';
-const int SERIAL_SPEED=115200;
+const char CMD_TERM1='\n';
+const char CMD_TERM2='\r';
+const char CMD_TERM3='|';
+const int SERIAL_SPEED=57600;
+const int FIRST_ANALOG_PIN=54;
 
 
 
@@ -98,7 +89,7 @@ void setup() {
 void loop() {
   if(Serial.available()) {
     char inChar = (char)Serial.read();
-    if(inChar=='\n' || inChar=='\r') {
+    if(inChar==CMD_TERM1 || inChar==CMD_TERM2 || inChar==CMD_TERM3) {
       buffPtr=buff;
       if(DEBUG) {
         Serial.print("String: ");
@@ -108,6 +99,9 @@ void loop() {
     } else if(buffPtr<buff+MAX_BUF) {
       *buffPtr++=inChar;
       *(buffPtr+1)='\0';
+      if(DEBUG) {
+        Serial.print(inChar);
+      }
     }
     // Serial.print(buff);
   }  
@@ -175,6 +169,7 @@ void doSet(char* anOrDig,int pinNum,int value) {
     } else {
       digitalWrite(pinNum, value);
     }
+    Serial.println("OK");
 }
 
 void doGet(char* anOrDig,int pinNum) {
@@ -190,11 +185,11 @@ void doGet(char* anOrDig,int pinNum) {
     
     if(*anOrDig=='a' || *anOrDig=='A') {
       int sensorValue = analogRead(pinNum);
-      Serial.print(sensorValue);
+      writelnPadded(sensorValue,4);
     } else {
       pinMode(pinNum, INPUT);
       int pinState = digitalRead(pinNum);
-      Serial.print(pinState);
+      Serial.println(pinState);
     }
 }
 
@@ -214,6 +209,8 @@ void doDir(char* inOrOut,int pinNum) {
     } else {
       pinMode(pinNum, OUTPUT);
     }
+    Serial.println("OK");
+
 }
 
 void doVers() {
@@ -359,6 +356,16 @@ void parseCommand(char*cmd) { // cmd is C string (\0 terminated char array)
 //
 //
 
+void writelnPadded( int number, byte width ) {
+  int currentMax = 10;
+  for (byte i=1; i<width; i++){
+    if (number < currentMax) {
+      Serial.print("0");
+    }
+    currentMax *= 10;
+  } 
+  Serial.println(number);
+}
 
 bool isNumericChar(char x) {
     return (x >= '0' && x <= '9');
