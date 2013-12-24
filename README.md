@@ -1,4 +1,4 @@
-<p><bArduino Pilot.ino - v 0.1</b> - a script to control and read the Arduino pins from a connected computer via serial port</p>
+<p><b>Arduino Pilot.ino - v 0.1</b> - a script to control and read the Arduino pins from a connected computer via serial port</p>
 
 <p>Use the Pilot.ino sketch to control an Arduino frome some scripting language, <b>PHP class library included</b>. Like a <b>remote method invocation</b> on an Arduino</p>
 
