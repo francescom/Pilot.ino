@@ -1,7 +1,9 @@
-<p><b>Arduino Pilot - v 0.1</b> - a script to control the Arduino pins from a connected computer via serial port</p>
+<p><b>Arduino Pilot.ino - v 0.1</b> - a script to control and read the Arduino pins from a connected computer via serial port</p>
+
+<p>Use the Pilot.ino sketch to control an Arduino frome some scripting language, <b>PHP class library included</b>. Like a <b>remote method invocation</b> on an Arduino</p>
 
 
-
+<p>PHP function set(a,b,c) -> Serial port -> Arduino -> C function doSet(a,b,c)
 
 
 <p>Original version for UDOO board by Francesco Munaf&ograve;</p>
@@ -11,14 +13,14 @@
 
 
 <p>
-The idea is to generically control the Arduino with some simple "Sketch Control Language"
+The idea is to generically control the Arduino with some simple "Sketch Control Language" or protocol,
 
 much like an SQL query controls (reads/writes) a database.
 
-We may slowly add commands when needed, to cover all possible interactions.
+Standard commands are limited but we may slowly add commands when needed, to cover all possible interactions.
 
 
-To add commands modify interpretCommand() to parse your new xyz command and then add a doXyz() function with the correct params
+To add commands modify interpretCommand() to parse your new xyz command and then add a doXyz() function with the correct params.
 </p>
 
 
