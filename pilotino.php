@@ -34,7 +34,7 @@ class PilotIno {
         
                
         function __construct($sport,$speed) {
-                // `stty -F $sport cs8 $speed ignbrk -brkint -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts`;
+                `stty -F $sport cs8 $speed ignbrk -brkint -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts`;
                 // `stty -F /dev/ttymxc3 cs8 115200 ignbrk -brkint -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts`;
                 
 	        $this->fp =fopen($sport, "w+");
