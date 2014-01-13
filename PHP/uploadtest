@@ -1,0 +1,115 @@
+#!/usr/bin/php
+<?php
+
+// PARAMETERS
+
+$SERVER = 'http://www.pangoo.it/pilotino/'; // may not handle well redirects: try www.hostname.com/index.php instead of just hostname.com/
+$SENSORS_ANALOG_READ=array('A0'); // send at every call (quicker than waiting for a get command retrieving, and sending results)
+$SENSORS_DIGITAL_READ=array(); // send at every call
+$SLEEP=0500000; // one sec = 1000000, sleep before reconnect
+$LED_CONNECTION=10; // FALSE to disable
+$LED_WAIT=9; // FALSE to disable
+$LINE_SEPARATOR="\n"; // Used by remote script to separate commands
+
+
+// Init Pilot.ino
+
+require('pilotino.php');
+$UDOOArduino=new PilotIno('/dev/ttymxc3',115200); // or 19200 57600 115200 same as SERIAL_SPEED constant in pilot.ino
+
+
+// Init pin directions: out for connection feedback pins
+
+if($LED_CONNECTION) $UDOOArduino->dir('out',$LED_CONNECTION);
+if($LED_WAIT) $UDOOArduino->dir('out',$LED_WAIT);
+
+// Init pin directions: in for sensors defined in setup params
+
+foreach($SENSORS_ANALOG_READ as $aSensor) {
+	$UDOOArduino->dir('in',$aSensor);
+}
+
+foreach($SENSORS_DIGITAL_READ as $aSensor) {
+	$UDOOArduino->dir('in',$aSensor);
+}
+           
+
+// reset things before loop
+$results=array(); // no last results to upload at first
+$timeStamp=''; // no last timestamp to upload at first
+
+// Go on forever (CTRL-C ends)           
+
+$VARIABLES=array(); // here the server may keep state information between iterations (as an alternative to a database)
+           
+while(TRUE) {
+
+// Sleep with LED on          
+
+	if($LED_WAIT) $UDOOArduino->set('d',$LED_WAIT,'hi');
+	usleep($SLEEP);
+	if($LED_WAIT) $UDOOArduino->set('d',$LED_WAIT,'lo');
+	
+	
+// Collect data to send          
+           
+	$data = array();
+	
+	foreach($SENSORS_ANALOG_READ as $aSensor) {
+		$sensorVal=$UDOOArduino->get('a',$aSensor);
+		$data[$aSensor]=$sensorVal;
+	}
+	
+	foreach($SENSORS_DIGITAL_READ as $aSensor) {
+		$sensorVal=$UDOOArduino->get('d',$aSensor);
+		$data[$aSensor]=$sensorVal;
+	}
+	$data['previous_timestamp']=$timeStamp;
+	$timeStamp=str_replace('.','',''.microtime(TRUE)*1000); // str_replace should be useless
+	$data['source_time']=$timeStamp;
+	$data['previous_results']=implode($LINE_SEPARATOR,$results);
+	$data['saved_states']=implode($LINE_SEPARATOR,$VARIABLES);
+	
+// Package it in a POST wrapper
+
+	// use key 'http' even if you send the request to https://...
+	$options = array(
+	    'http' => array(
+	        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+	        'method'  => 'POST',
+	        'content' => http_build_query($data),
+	    ),
+	);
+	$context  = stream_context_create($options);
+	
+// And send it
+// Led on while waiting for reply
+
+	if($LED_CONNECTION) $UDOOArduino->set('d',$LED_CONNECTION,'hi');
+	$connectionResult = file_get_contents($SERVER, false, $context);
+	if($LED_CONNECTION) $UDOOArduino->set('d',$LED_CONNECTION,'lo');
+	
+	// var_dump($connectionResult);
+   echo('.');
+   $commands=explode($LINE_SEPARATOR,$connectionResult);
+   $results=array();
+   foreach($commands as $aCommand) {
+   	$aCommand=trim($aCommand);
+   	if($aCommand=='') continue;
+   	if(substr($aCommand,0,3)=='do ') { // to be sure to execute only intended commands, start every line with "do "
+   		$results[]=substr($aCommand,3).$UDOOArduino->sendCmd(substr($aCommand,3));
+   	} else if(substr($aCommand,0,5)=='save ') {
+   		$aCommand=explode(' ',$aCommand);
+   		if(count($aCommand)===3) $VARIABLES[$aCommand[1]]=$aCommand[1].'='.$aCommand[2];
+   		else if(count($aCommand)===2) $VARIABLES[$aCommand[1]]=$aCommand[1].'=';
+   	}
+   	
+   }
+
+}
+
+// Neverneverland
+
+$UDOOArduino=null; // Uselessuselessline
+
+?>
