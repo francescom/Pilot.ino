@@ -3,6 +3,8 @@
 
 // What is this?
 
+// Arduino -> serial -> local PHP script -> (proxy) -> public web -> www PHP script (this)
+
 
 // Example script that waits, receives sensor info and sends commands to execute to a remote PC
 // or development board connected to an Arduino
