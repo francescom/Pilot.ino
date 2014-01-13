@@ -1,9 +1,31 @@
 #!/usr/bin/php
 <?php
 
+
+
+// What is this?
+
+// Arduino -> serial -> local PHP script -> (proxy) -> public web -> www PHP script
+
+
+// Example PHP standalone script that reads sensor info from an Arduino over serial
+// and sends them to a remote (public) web server, receives commands to execute in return
+// and sends them to the Arduino
+
+// The usage scenario is a development board or small PC connected to the internet from
+// inside a protected LAN with NAT or firewall. The small PC can only send GET/POST requests out
+// it can not be reached from the outside world.
+
+// Developed for UDOO board (linux+Arduino embedded)
+
+// This uploadtest script runs on the small PC and connects to a receiver script on some public web server
+// The public web server can receive sensor data from the small PC and return commands to execute
+// (turn on/off or dim leds, activate motors, etc..)
+
+
 // PARAMETERS
 
-$SERVER = 'http://www.pangoo.it/pilotino/'; // may not handle well redirects: try www.hostname.com/index.php instead of just hostname.com/
+$SERVER = 'http://www.pangoo.it/pilotino/receiver.php'; // may not handle well redirects: try www.hostname.com/index.php instead of just hostname.com/
 $SENSORS_ANALOG_READ=array('A0'); // send at every call (quicker than waiting for a get command retrieving, and sending results)
 $SENSORS_DIGITAL_READ=array(); // send at every call
 $SLEEP=0500000; // one sec = 1000000, sleep before reconnect
