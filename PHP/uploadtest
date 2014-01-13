@@ -120,6 +120,8 @@ while(TRUE) {
    	if($aCommand=='') continue;
    	if(substr($aCommand,0,3)=='do ') { // to be sure to execute only intended commands, start every line with "do "
    		$results[]=substr($aCommand,3).$UDOOArduino->sendCmd(substr($aCommand,3));
+   		echo(substr($aCommand,3));
+   		print_r($results);
    	} else if(substr($aCommand,0,5)=='save ') {
    		$aCommand=explode(' ',$aCommand);
    		if(count($aCommand)===3) $VARIABLES[$aCommand[1]]=$aCommand[1].'='.$aCommand[2];
