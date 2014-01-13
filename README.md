@@ -71,8 +71,7 @@ To add commands modify interpretCommand() to parse your new xyz command and then
 
 or that can be done better on the Arduino side), for example:
 </p>
-<p>fading analogs in/out:
-playing tunes/notes:
+<p>fading analogs in/out, playing tunes/notes
 </p>
 
 

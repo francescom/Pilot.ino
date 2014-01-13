@@ -5,7 +5,7 @@
 
 // What is this?
 
-// Arduino -> serial -> local PHP script -> (proxy) -> public web -> www PHP script
+// Arduino -> serial -> local PHP script (this) -> (proxy) -> public web -> www PHP script
 
 
 // Example PHP standalone script that reads sensor info from an Arduino over serial
@@ -119,8 +119,14 @@ while(TRUE) {
    	$aCommand=trim($aCommand);
    	if($aCommand=='') continue;
    	if(substr($aCommand,0,3)=='do ') { // to be sure to execute only intended commands, start every line with "do "
+<<<<<<< HEAD
    		$results[]=$UDOOArduino->sendCmd(substr($aCommand,3));
    		echo("<do> ".substr($aCommand,3)."\n");
+=======
+   		$results[]=substr($aCommand,3).$UDOOArduino->sendCmd(substr($aCommand,3));
+   		// echo(substr($aCommand,3));
+   		// print_r($results);
+>>>>>>> 921259c374c66f6eb12ef02ad9702190b45dc8ff
    	} else if(substr($aCommand,0,5)=='save ') {
    		$aCommand=explode(' ',$aCommand);
    		if(count($aCommand)===3) $VARIABLES[$aCommand[1]]=$aCommand[1].'='.$aCommand[2];
