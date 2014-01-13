@@ -48,7 +48,7 @@ if($LED_WAIT) $UDOOArduino->dir('out',$LED_WAIT);
 // Init pin directions: in for sensors defined in setup params
 
 foreach($SENSORS_ANALOG_READ as $aSensor) {
-	$UDOOArduino->dir('in',$aSensor);
+	// $UDOOArduino->dir('in',$aSensor);
 }
 
 foreach($SENSORS_DIGITAL_READ as $aSensor) {
