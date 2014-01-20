@@ -76,7 +76,11 @@ if(!isset($savedStates['toggle']) || $savedStates['toggle']=='0') {
 }
 
 if(is_numeric($A0)) {
+<<<<<<< HEAD
+	$commands.='do set a 13 '.linearizeLed($A0*255/1023)."\n"; // Linearize with = 
+=======
 	$commands.='do set a 12 '.(intVal($A0*255/1023))."\n";
+>>>>>>> aa1b1e3b06cb916e2b819cdd4184819dce98e090
 }
 echo($commands);
 
@@ -87,4 +91,9 @@ print_r($_REQUEST); // debug stuff
 // print_r($savedStates); // debug stuff
 // echo("\nRESULTS: "); // debug stuff
 // print_r($previousResults); // debug stuff
+
+function linearizeLed($x) {
+	// http://electronics.stackexchange.com/questions/1983/correcting-for-non-linear-brightness-in-leds-when-using-pwm
+	return intVal(round(1/(1+exp((($x/21)-6)*-1))*255));
+}
 ?>
