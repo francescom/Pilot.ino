@@ -12,13 +12,13 @@ class PilotIno {
         function dir($inOut,$pin) {
                 if($inOut!='in') $inOut='out';
                 else $inOut='in';
-                return ($this->sendCmd('dir '.$inOut.' '.$pin))=='OK';
+                return ($this->sendCmd('dir '.$inOut.' '.$pin))==='OK';
         }
         
         function set($digAnag,$pin,$val) {
                 if($digAnag!='d') $digAnag='a';
                 else $digAnag='d';
-                return ($this->sendCmd('set '.$digAnag.' '.$pin.' '.$val))=='OK';
+                return ($this->sendCmd('set '.$digAnag.' '.$pin.' '.$val)==='OK'); 
         }
         
         function get($digAnag,$pin) {
@@ -39,7 +39,7 @@ class PilotIno {
                 
 	        $this->fp =fopen($sport, "w+");
 	        if( !$this->fp) {
-	                echo "ERROR CAN'T OPEN PORT\n";
+	                echo "ERROR:CAN'T OPEN PORT\n";
 	                die();
 	        }
                 stream_set_blocking($this->fp,0);
@@ -75,7 +75,7 @@ class PilotIno {
                                 }
                                 if($timeout>0 && (microtime(true)-$stm)>$timeout) {
                                         $loop=FALSE;
-                                        $ans='ERROR TIMEOUT Data received: '.$ans;
+                                        $ans='ERROR:TIMEOUT:Data received: '.$ans;
                                         break;
                                 }
                         } while (TRUE);
