@@ -31,6 +31,7 @@ $SENSORS_DIGITAL_READ=array(); // send at every call
 $SLEEP=1000000; // one sec = 1000000, sleep before reconnect
 $LED_CONNECTION=10; // FALSE to disable
 $LED_WAIT=9; // FALSE to disable
+$LED_SENSOR_FEEDBACK=FALSE; // FALSE to disable
 $LINE_SEPARATOR="\n"; // Used by remote script to separate commands
 
 
@@ -44,6 +45,7 @@ $UDOOArduino=new PilotIno('/dev/ttymxc3',115200); // or 19200 57600 115200 same 
 
 if($LED_CONNECTION) $UDOOArduino->dir('out',$LED_CONNECTION);
 if($LED_WAIT) $UDOOArduino->dir('out',$LED_WAIT);
+if($LED_SENSOR_FEEDBACK) $UDOOArduino->dir('out',$LED_SENSOR_FEEDBACK);
 
 // Init pin directions: in for sensors defined in setup params
 
@@ -76,10 +78,14 @@ while(TRUE) {
 // Collect data to send          
            
 	$data = array();
+	$firstSensor=NULL;
 	
 	foreach($SENSORS_ANALOG_READ as $aSensor) {
 		$sensorVal=$UDOOArduino->get('a',$aSensor);
 		$data[$aSensor]=$sensorVal;
+		if($firstSensor===NULL) {
+			$firstSensor=$sensorVal;
+		}
 	}
 	
 	foreach($SENSORS_DIGITAL_READ as $aSensor) {
@@ -119,23 +125,26 @@ while(TRUE) {
    	$aCommand=trim($aCommand);
    	if($aCommand=='') continue;
    	if(substr($aCommand,0,3)=='do ') { // to be sure to execute only intended commands, start every line with "do "
-<<<<<<< HEAD
    		$results[]=$UDOOArduino->sendCmd(substr($aCommand,3));
    		echo("<do> ".substr($aCommand,3)."\n");
-=======
-   		$results[]=substr($aCommand,3).$UDOOArduino->sendCmd(substr($aCommand,3));
+   		$results[]=substr($aCommand,3).' '.$UDOOArduino->sendCmd(substr($aCommand,3));
    		// echo(substr($aCommand,3));
    		// print_r($results);
->>>>>>> 921259c374c66f6eb12ef02ad9702190b45dc8ff
    	} else if(substr($aCommand,0,5)=='save ') {
    		$aCommand=explode(' ',$aCommand);
    		if(count($aCommand)===3) $VARIABLES[$aCommand[1]]=$aCommand[1].'='.$aCommand[2];
    		else if(count($aCommand)===2) $VARIABLES[$aCommand[1]]=$aCommand[1].'=';
     		echo("<save> ".$aCommand[1].' = '.$aCommand[2]."\n");
-  	}
+  		}
    	
    }
-   // print_r($results);
+   // $UDOOArduino->dir('out',13);
+   if($LED_SENSOR_FEEDBACK && $firstSensor!==NULL) {
+		echo($LED_SENSOR_FEEDBACK." -> ".intVal($firstSensor*255/1023));	
+   	echo( ': '.trim($UDOOArduino->set('a',12,16)));
+  		echo("\n");
+	}
+   print_r($results);
    echo("\n");
 
 }

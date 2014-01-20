@@ -76,7 +76,7 @@ if(!isset($savedStates['toggle']) || $savedStates['toggle']=='0') {
 }
 
 if(is_numeric($A0)) {
-	$commands.='do set a 11 '.(intVal($A0)*255/1023)."\n";
+	$commands.='do set a 12 '.(intVal($A0*255/1023))."\n";
 }
 echo($commands);
 

@@ -104,7 +104,15 @@ int getValue(char*str) {
 
 
 void doSet(char* anOrDig,int pinNum,int value) {
-    /**/
+    /** /
+      Serial.print("doSet( ");
+      Serial.print(anOrDig);
+      Serial.print(", ");
+      Serial.print(pinNum);
+      Serial.print(", ");
+      Serial.print(value);
+      Serial.print(" ) ");
+    //*/
     if(DEBUG) {
       Serial.print("doSet( ");
       Serial.print(anOrDig);
@@ -112,13 +120,15 @@ void doSet(char* anOrDig,int pinNum,int value) {
       Serial.print(pinNum);
       Serial.print(", ");
       Serial.print(value);
-      Serial.println(" )");
+      Serial.print(" ) ");
     }
-    //*/
+
     
     if(!strcmp(anOrDig,"a") || !strcmp(anOrDig,"A") || !strcmp(anOrDig,"analog")) {
+      Serial.print("A ");
       analogWrite(pinNum, value); 
     } else {
+      Serial.print("D ");
       digitalWrite(pinNum, value);
     }
     Serial.println("OK");
