@@ -14,9 +14,9 @@
 // inside a protected LAN with NAT or firewall. The small PC can only send GET/POST requests out
 // it can not be reached from the outside world.
 
-// Developed for UDOO board (linux+Arduino embedded)
+// Developed for UDOO board (Linux+Arduino embedded)
 
-// The uploadtest script runs on the small PC and connects to this sample script on some public web server
+// The upload script runs on the small PC and connects to this sample script on some public web server
 // The public web server can receive sensor data from the small PC and return commands to execute
 // (turn on/off or dim leds, activate motors, etc..)
 
@@ -35,54 +35,45 @@
 
 
 
-// get a sensor if it is listed in $SENSORS_ANALOG_READ or $SENSORS_DIGITAL_READ in sending script
-if(isset($_REQUEST['A0'])) $A0=$_REQUEST['A0'];
-else $A0='?';
 
-// get all stuff I have previously sent with save <name> <value>
-// Useful to know, for example if board is reset (must init values on it)
+// PARAMETERS
 
-if(isset($_REQUEST['saved_states'])) {
-	$savedStatesRaw=explode("\n",$_REQUEST['saved_states']);
-	$savedStates=array();
-	foreach($savedStatesRaw as $aState) {
-		$aState=explode('=',$aState);
-		if(count($aState)>1) {
-			$savedStates[$aState[0]]=$aState[1];
-		} else $savedStates[$aState[0]]='';
-	}
-} else $savedStates=array();
+$SENSORS_ANALOG_READ=array('A0'); // receive at every call (quicker than waiting for a get command retrieving, and sending results)
+$SENSORS_DIGITAL_READ=array(); // receive at every call
+$LINE_SEPARATOR="\n"; // Used by remote script to separate commands
 
-// get all results of previously sent commands (for sensors use $SENSORS_ANALOG_READ or $SENSORS_DIGITAL_READ)
 
-if(isset($_REQUEST['previous_results'])) $previousResults=explode("\n",$_REQUEST['previous_results']);
-else $previousResults=array();
+include('pilotino_remote.php');
+
+$remoteArduino=new PilotinoReceiver($SENSORS_ANALOG_READ,$SENSORS_DIGITAL_READ,$LINE_SEPARATOR);
+
+$remoteArduino->parseRequest($_REQUEST);
+
+
+
+
 
 $commands='';
 
-if(!isset($savedStates['inited'])) {
-	$commands.='do dir out 8'."\n";	
-	$commands.='do dir out 11'."\n";	
-	$commands.='save inited 1'."\n";	
+if(!$remoteArduino->isState('inited')) {
+	$remoteArduino->dir('out',8);
+	$remoteArduino->dir('out',11);
+	$remoteArduino->saveState('inited','1');
 }
 
 // example toggling a led
-if(!isset($savedStates['toggle']) || $savedStates['toggle']=='0') {
-	$commands.='save toggle 1'."\n";	
-	$commands.='do set d 8 hi'."\n";	
+if(!$remoteArduino->isState('toggle') || $remoteArduino->getState('toggle')=='0') {
+	$remoteArduino->saveState('toggle','1');
+	$remoteArduino->set('d',8,'hi');
 } else {
-	$commands.='save toggle 0'."\n";	
-	$commands.='do set d 8 lo'."\n";	
+	$remoteArduino->saveState('toggle','0');
+	$remoteArduino->set('d',8,'lo');
 }
 
-if(is_numeric($A0)) {
-<<<<<<< HEAD
-	$commands.='do set a 13 '.linearizeLed($A0*255/1023)."\n"; // Linearize with = 
-=======
-	$commands.='do set a 12 '.(intVal($A0*255/1023))."\n";
->>>>>>> aa1b1e3b06cb916e2b819cdd4184819dce98e090
+if($remoteArduino->isSensor('A0')) {
+	$remoteArduino->set('a',13,linearizeLed($remoteArduino->getSensor('A0')*255/1023));
 }
-echo($commands);
+$remoteArduino->dumpAllAndClose();
 
 // All other echo can be printed on the local script to debug
 echo("\nREQUEST: "); // debug stuff
@@ -93,7 +84,11 @@ print_r($_REQUEST); // debug stuff
 // print_r($previousResults); // debug stuff
 
 function linearizeLed($x) {
-	// http://electronics.stackexchange.com/questions/1983/correcting-for-non-linear-brightness-in-leds-when-using-pwm
+	// http://www.picbasic.co.uk/forum/showthread.php?t=16187
+	$gamma=0.75;
+	// return intVal(round((255^((($x+1)/255)^gamma)+.3)));
+	
+	// http://electronics.stackexchange.com/questions/1983/correcting-for-non-linear-brightness-in-leds-when-using-pwm	
 	return intVal(round(1/(1+exp((($x/21)-6)*-1))*255));
 }
 ?>
