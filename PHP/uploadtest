@@ -16,7 +16,7 @@
 // inside a protected LAN with NAT or firewall. The small PC can only send GET/POST requests out
 // it can not be reached from the outside world.
 
-// Developed for UDOO board (linux+Arduino embedded)
+// Developed for UDOO board (Linux+Arduino embedded)
 
 // This uploadtest script runs on the small PC and connects to a receiver script on some public web server
 // The public web server can receive sensor data from the small PC and return commands to execute
@@ -25,6 +25,7 @@
 
 // PARAMETERS
 
+$COMPUTER_NAME="board_1"; // Send to server to group data by computer/board
 $SERVER = 'http://www.pangoo.it/pilotino/receiver.php'; // may not handle well redirects: try www.hostname.com/index.php instead of just hostname.com/
 $SENSORS_ANALOG_READ=array('A0'); // send at every call (quicker than waiting for a get command retrieving, and sending results)
 $SENSORS_DIGITAL_READ=array(); // send at every call
@@ -97,7 +98,8 @@ while(TRUE) {
 	$data['source_time']=$timeStamp;
 	$data['previous_results']=implode($LINE_SEPARATOR,$results);
 	$data['saved_states']=implode($LINE_SEPARATOR,$VARIABLES);
-	
+	$data['name']=$COMPUTER_NAME;
+
 // Package it in a POST wrapper
 
 	// use key 'http' even if you send the request to https://...
@@ -117,8 +119,8 @@ while(TRUE) {
 	$connectionResult = file_get_contents($SERVER, false, $context);
 	if($LED_CONNECTION) $UDOOArduino->set('d',$LED_CONNECTION,'lo');
 	
-	// echo($connectionResult);
-   // echo("\n");
+	echo($connectionResult);
+   echo("\n");
    $commands=explode($LINE_SEPARATOR,$connectionResult);
    $results=array();
    foreach($commands as $aCommand) {
@@ -127,7 +129,7 @@ while(TRUE) {
    	if(substr($aCommand,0,3)=='do ') { // to be sure to execute only intended commands, start every line with "do "
    		$results[]=$UDOOArduino->sendCmd(substr($aCommand,3));
    		echo("<do> ".substr($aCommand,3)."\n");
-   		$results[]=substr($aCommand,3).' '.$UDOOArduino->sendCmd(substr($aCommand,3));
+   		// $results[]=substr($aCommand,3).' '.$UDOOArduino->sendCmd(substr($aCommand,3));
    		// echo(substr($aCommand,3));
    		// print_r($results);
    	} else if(substr($aCommand,0,5)=='save ') {
@@ -144,8 +146,8 @@ while(TRUE) {
    	echo( ': '.trim($UDOOArduino->set('a',12,16)));
   		echo("\n");
 	}
-   print_r($results);
-   echo("\n");
+   // print_r($results);
+   // echo("\n");
 
 }
 
