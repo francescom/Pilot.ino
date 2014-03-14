@@ -1,6 +1,5 @@
 
-
 *~
 *(copy)*
-
-
+*__pycache__*
+*.pyc

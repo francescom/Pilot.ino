@@ -34,6 +34,15 @@ class PilotinoReceiver {
 			$this->savedStates[$key]=$val;
 		}
 	}
+	function addCommandsOrStates($list) {	// 'do ' and  'save ' must be already included
+											// no $updateLocal.
+		if(!is_array($list)) {
+			$list=explode($this->LINE_SEPARATOR,$list);
+		}
+		foreach($list as $key=>$anItem) {
+			$this->queuedCommands[]=$anItem;
+		}
+	}
 	function getState($key) {
 		if(isset($this->savedStates[$key])) return $this->savedStates[$key];
 		else return null;
@@ -88,7 +97,7 @@ class PilotinoReceiver {
 	}
 	function dumpAllAndClose($returnNotEcho=FALSE) {
 		$outCmds='';
-		print_r($this->queuedCommands);
+		// print_r($this->queuedCommands);
 		foreach($this->queuedCommands as $aCmd) {
 			$outCmds.=$aCmd.$this->LINE_SEPARATOR;
 		}

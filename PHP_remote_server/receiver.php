@@ -38,27 +38,50 @@
 
 // PARAMETERS
 
-$SENSORS_ANALOG_READ=array('A0'); // receive at every call (quicker than waiting for a get command retrieving, and sending results)
+$SENSORS_ANALOG_READ=array('A0'); // receive at every call (quicker than sending a get command, and waiting for results)
 $SENSORS_DIGITAL_READ=array(); // receive at every call
 $LINE_SEPARATOR="\n"; // Used by remote script to separate commands
+
+
+// STARTUP
+
+ini_set ('error_reporting' ,2047); 
+ini_set ('display_errors' ,"1"); 
+ini_set ('display_startup_errors' ,"1"); 
+
+define('C_O','');
+$THIS_PAGE=$_SERVER['PHP_SELF'];
+
+
+////////////////////////////////////////
+
+define('IMG_RESIZER',C_O.'iw/irs.php');
+
+
+require(C_O.'local_inc/setup.php');
+require(C_O.'inc/MyDB.php');
+// require(C_O.'inc/Vars.php');
+// require(C_O.'inc/SVars.php');
+
+
+////////////////////////////////////////
+
+$db=new MyDB();
+$db->startConnectionArea();
 
 
 include('pilotino_remote.php');
 
 $remoteArduino=new PilotinoReceiver($SENSORS_ANALOG_READ,$SENSORS_DIGITAL_READ,$LINE_SEPARATOR);
-
 $remoteArduino->parseRequest($_REQUEST);
+$timeStampStr=str_replace('.','',''.microtime(TRUE)*1000);
 
 
-
-
-
-$commands='';
 
 if(!$remoteArduino->isState('inited')) {
 	$remoteArduino->dir('out',8);
 	$remoteArduino->dir('out',11);
-	$remoteArduino->saveState('inited','1');
+	$remoteArduino->saveState('inited',$timeStampStr);
 }
 
 // example toggling a led
@@ -72,7 +95,35 @@ if(!$remoteArduino->isState('toggle') || $remoteArduino->getState('toggle')=='0'
 
 if($remoteArduino->isSensor('A0')) {
 	$remoteArduino->set('a',13,linearizeLed($remoteArduino->getSensor('A0')*255/1023));
+	
+	$db->insertQuery('arduino_sensors',$InfoArray,$Replace=FALSE);
+	
+	
 }
+
+foreach($remoteArduino->sensors as $aSensor=>$aSensorVal) {
+	
+	$sql=$db->insertQuery('arduino_sensors',array(
+		'timestamp'=>time(),
+		'board_id'=>'board_1', // this should come from the uploading machine
+		'sensor_name'=>preg_replace('/[?A-Z0-9_-]/','',$aSensor),
+		'sensor_value'=>preg_replace('/[?A-Z0-9_-]/','',$aSensorVal),
+		'other_data_1'=>'',
+		'other_data_2'=>'',
+	),FALSE);
+	$db->query($sql);
+	$db->query('delete from `arduino_sensors` where timestamp<'.(time()-60*60));
+	
+}
+$cmds=$db->collect('arduino_commands','`order`,`command_text`',array('board_id'=>'board_1'),'','`timestamp`,`order`','');
+
+// yes here some mild things may happen (like you light a let twice)
+
+$db->delete('arduino_commands',array('board_id'=>'board_1'),'','');
+
+// yes here some very bad things may happen (like you do not start your oxygen making life support system)
+
+
 $remoteArduino->dumpAllAndClose();
 
 // All other echo can be printed on the local script to debug

@@ -40,3 +40,4 @@ CREATE TABLE IF NOT EXISTS `arduino_sensors` (
 --
 -- Dumping data for table `arduino_sensors`
 --
+

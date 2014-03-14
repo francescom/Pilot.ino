@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
         // This is just to turn off the leds left up by testpilot
+        // This sample command line script turns off the leds 5-13 (echoes sensor A0) and ends
         
         require('pilotino.php');
         $UDOOArduino=new PilotIno('/dev/ttymxc3',115200); // or 19200 57600 115200 same as SERIAL_SPEED constant in pilot.ino
