@@ -2,8 +2,16 @@
 <?php
 
 // This is CLI PHP, launch it and it will forever ask Pilot.ino for pin 13
-// and launch your program when result is 1
+// and launch your program when result is 0
 // Stop with CTRL-C
+
+// This example uses the internal Pull Up resistors to limit circuitry
+// it means you just have to connect one button wire to pin 13 and the other wire to GND
+// set pin 13 mode to input, but do a digitalWrite to HIGH
+// ( $UDOOArduino->dir('in',$BUTTON_PIN); $UDOOArduino->set('d',$BUTTON_PIN,'hi');)
+// then you will have LOW if button pressed and HIGH if button released (reversed)
+
+
 
 
     // configure here, executed below
