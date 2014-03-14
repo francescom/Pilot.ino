@@ -1,0 +1,50 @@
+#!/usr/bin/php
+<?php
+
+// This is CLI PHP, launch it and it will forever ask Pilot.ino for pin 13
+// and launch your program when result is 1
+// Stop with CTRL-C
+
+
+    // configure here, executed below
+    $SCRIPT_TO_LAUNCH='ls -al';
+    $BUTTON_PIN=20; // connect button wire to pin 13 as written on the board, other wire to GND
+    $LED_PIN=19; // connect button wire to pin 13 as written on the board, other wire to GND
+    $BUTTON_DOWN='0'; //inverted to avoid resistor
+    $BUTTON_UP='1';
+    
+    
+    $isPressed=FALSE;
+ 
+    require('pilotino.php');
+    $UDOOArduino=new PilotIno('/dev/ttymxc3',115200);
+  
+    $UDOOArduino->dir('in',$BUTTON_PIN); // pin inward as digital sensor
+    $UDOOArduino->set('d',$BUTTON_PIN,'hi');
+    $UDOOArduino->dir('out',$LED_PIN); // pin outward as led
+    $UDOOArduino->set('d',$LED_PIN,'lo');
+ 	
+    $lastButton=$BUTTON_UP;
+    while(TRUE) { // CTRL-C to exit
+            $button=$UDOOArduino->get('d',$BUTTON_PIN);
+            // echo($button);
+            // Only at first press, not every cy cle!
+            if($lastButton!=$button) {
+            	if($button==$BUTTON_DOWN) {
+          			$UDOOArduino->set('d',$LED_PIN,'hi');
+            		$isPressed=TRUE;
+               	$res=`$SCRIPT_TO_LAUNCH`; // Executing script
+                	// wait .5 sec to avoid button "bouncing" (http://www.elexp.com/t_bounc.htm)
+                	echo($res);
+                	usleep(0500000);
+         			$UDOOArduino->set('d',$LED_PIN,'lo');
+                } else if($button==$BUTTON_UP) {
+            		$isPressed=FALSE;
+                 	usleep(0500000);
+               }
+            }
+            usleep(0010000); // 1/100 of sec
+            $lastButton=$button;
+    }
+    $UDOOArduino=null; // never here
+?>
