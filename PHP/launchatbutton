@@ -1,0 +1,32 @@
+#!/usr/bin/php
+
+// This is CLI PHP, launch it and it will forever ask Pilot.ino for pin 13
+// and launch your program when result is 1
+// Stop with CTRL-C
+
+<?php
+    // configure here, executed below
+    $SCRIPT_TO_LAUNCH='my_cli_script_or_app arg12 arg2 arg3';
+    $BUTTON_PIN=13; // connect button wire to pin 13 as written on the board, other wire to GND
+
+
+    require('pilotino.php');
+    $UDOOArduino=new PilotIno('/dev/ttymxc3',115200);
+   
+    $UDOOArduino->dir('in',$BUTTON_PIN); // pin inward as digital sensor
+  
+    $lastButton='0';
+    while(TRUE) { // CTRL-C to exit
+            $button=$UDOOArduino->get('d',$BUTTON_PIN);
+            
+            // Only at first press, not every cycle!
+            if($lastButton!=$button && $button=='1') {
+                `$SCRIPT_TO_LAUNCH`; // Executing script
+                // wait 2 secs to avoid button "bouncing" (http://www.elexp.com/t_bounc.htm)
+                usleep(2000000);
+            }
+            usleep(0001000); // 1/1000 of sec
+            $lastButton=$button;
+    }
+    $UDOOArduino=null; // never here
+?>
