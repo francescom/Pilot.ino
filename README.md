@@ -1,5 +1,9 @@
 <p><b>Arduino Pilot.ino - v 0.1</b> - a script to control and read the Arduino pins from a connected computer via serial port</p>
 
+<p><b>See the help.txt file for some.. help... list of files and how to avoid common caveats</b>
+</p>
+
+
 <p>Use the Pilot.ino sketch to control an Arduino frome some scripting language, <b>PHP class library included</b>. Like a <b>remote method invocation</b> on an Arduino</p>
 
 
@@ -67,8 +71,6 @@ To add commands modify interpretCommand() to parse your new xyz command and then
 <p>Script options at the top of the script.
 </p>
 
-<p><b>See the help.txt file for some.. help... list of files and how to avoid common caveats</b>
-</p>
 
 <p>Some ideas for commands to add (anything that the speed of serial port can't handle,
 
