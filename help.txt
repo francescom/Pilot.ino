@@ -1,7 +1,45 @@
 Pilot.ino How to
 
 
-1) check you have PHP installed
+
+
+COMMON CAVEATS
+
+
+1) make sure the serial port is writable by the script (PHP or python or shell) user.
+
+In Linux if /dev/ttymxc3 is the serial port connected to the arduino, to set it writable by anybody:
+
+    sudo chmod a+w /dev/ttymxc3
+    
+
+2) make sure the scripts are executable (be it commandline PHP, a PHP web page, or a python script)
+
+ In linux:
+ 
+ 	sudo chmod a+x /var/www/webpagegetsensor.php
+	
+or, from the folder containing testpilot:
+	
+    sudo chmod a+x ./testpilot
+    
+or, from the folder containing pilotino_test.py:
+    
+    sudo chmod a+x ./pilotino_test.py
+    
+etc..
+This is valid for any script, not only relative to Pilot.ino
+
+
+3) Remember to put the library (pilotino.php for PHP, pilotino.py for python, etc..) in the same folder as the example script, or modify the include/import instrucions accordingly.
+
+
+
+
+COMMANDLINE PHP
+
+
+1) check you have PHP installed (and webserver if needed). Test by viewing some other PHP pages.
 
 2) using the Arduino IDE send the pilot.ino script to your Arduino board
 
@@ -9,11 +47,18 @@ Pilot.ino How to
 
     sudo chmod a+x ./testpilot
 
-4) to run the example, pilotino.php must be in the same folder as testpilot
+4) to run the example, pilotino.php must be in the same folder as testpilot or the web page
 
 5) edit the testpilot file to setup options, like php location at the top of the file if not /usr/bin/php or the speed and name of the serial port
 
-6) run testpilot
+6) make sure the serial port is writable by the PHP user. You may use:
+
+    sudo chmod a+w /dev/ttymxc3
+    
+if /dev/ttymxc3 is the serial port of your Arduino
+
+
+7) run testpilot
 
 on linux/osx:
 
@@ -21,11 +66,96 @@ on linux/osx:
 
 or you may launch php as a command:
 
-    php testpilot
+    sudo php testpilot
 
 
-7) watch leds connected to pins 5-13 intermittently lighting, and value of sensor connected to analog A0 displayed to console.
+8) watch leds connected to pins 5-13 intermittently lighting, and value of sensor connected to analog A0 displayed to console.
 
-8) modify at your pleasure (for instance you may upload sensor value to a website instead of printing it just by calling a URL http://website.com/?sensorValue=123)
+9) modify at your pleasure; for instance you may upload sensor value to a website instead of printing it just by calling a URL 
+
+	file_get_contents('http://website.com/receiver.php?sensorValue='.$sensor);
+	
+	or, to do it on the same computer:
+	
+	file_get_contents('http://localhost/save.php?sensorValue='.$sensor);
+
+
+
+
+
+
+PHP WEBPAGE
+
+
+1) check you have PHP and webserver installed and running. Test by running some other PHP pages from the webserver folder (here /var/www).
+
+2) using the Arduino IDE send the pilot.ino script to your Arduino board
+
+3) to run a web page example remember web php scripts must be executable too:
+
+    sudo chmod a+x /var/www/webpagegetsensor.php
+
+4) to run the example, pilotino.php must be in the same folder as webpagegetsensor.php or the web page
+
+5) edit the webpagegetsensor.php file to setup options, like speed and name of the serial port
+
+
+6) make sure the serial port is writable by the PHP user. You may use:
+
+    sudo chmod a+w /dev/ttymxc3
+    
+if /dev/ttymxc3 is the serial port of your Arduino
+
+
+7) launch webpage 
+
+	Open a browser and go to http://localhost/webpagegetsensor.php
+
+or http://<your_ip_address>/webpagegetsensor.php from outside.
+
+
+8) watch led connected to pin 5 light up, and value of sensor connected to analog A0 displayed in web page.
+
+9) modify at your pleasure; for instance you may remove the html and return just the value as plain text or xml or JSON to call the script from ajax/javascript
+
+
+
+
+
+
+PYTHON
+
+
+Python suppor is experimental as my knowledge of the language is near to zero, but I managed to make a library and a test file, feel free to play with them.
+
+
+
+
+
+EXAMPLES INCLUDED
+
+PHP Most examples are PHP shell scripts
+
+pushbuttonlauncher - demonstrates opening a program/command at the push of a Button. Uses the internal Pull Up resistors to limit circuitry, it means you just have to connect one button wire to pin 13, and the other wire to GND.
+testpilot -  the main and simpler demo, just light up leds and read a sensor forever. Modify to write values to a db or upload to a server.
+webpagegetsensor.php - example of web page, lights up a led, reads sensor, returns some HTML
+uploadtest - this is more complicated, it will connect to a remote PHP script (example in PHP_remote_server/receiver.php) and send sensor data and receive commands. So you can pilot your Arduino from the world (no public ip required).
+
+
+They all require pilotino.php (library) in the same folder.
+
+
+
+PYTHON
+
+pilotino_test.py - demo example (untested) of using the pilotino.py library
+
+
+The PHP_remote_server folder contains experimental files that interface with the uploadtest script
+
+receiver.php - the remote script that receives sensor data from local uploadtest and saves them to a mysql table, reads commands (light led, turn off pin) from a mysql table and sends them back in return to uploadtest. So you can pilot your Arduino from the world (no public ip required).
+
+
+
 
 
