@@ -4,7 +4,7 @@
 </p>
 
 
-<p>Use the Pilot.ino sketch to control an Arduino frome some scripting language, <b>PHP class library included</b>. Like a <b>remote method invocation</b> on an Arduino</p>
+<p>Use the Pilot.ino sketch to control an Arduino from some scripting language, <b>PHP class library included</b>. Like a <b>remote method invocation</b> on an Arduino</p>
 
 
 <p>PHP function set(a,b,c) -> Serial port -> Arduino -> C function doSet(a,b,c)
