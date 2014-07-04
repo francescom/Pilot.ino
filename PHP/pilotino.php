@@ -40,7 +40,8 @@ class PilotIno {
 	        $this->fp =fopen($sport, "w+");
 	        if( !$this->fp) {
 	                echo "ERROR:CAN'T OPEN PORT\n";
-	                die();
+	                // die();
+	                return;
 	        }
                 stream_set_blocking($this->fp,0);
                 stream_set_timeout($this->fp,10);
@@ -49,11 +50,17 @@ class PilotIno {
                 // $this->fp=$fp;
         }
         function __destruct() {
-                fclose($this->fp);
+                if($this->fp!=null && $this->fp) fclose($this->fp);
                 $this->fp=null;
         }
         function sendCmd($cmd,$timeout=.3) {
            if($timeout==='' || $timeout===null) $timeout=0; // don't. Really.
+           
+           if($this->fp==null || !$this->fp) {
+				echo "ERROR: PORT NOT OPEN \n";
+				// die();
+				return;
+           }
            
            fflush($this->fp);
            $clear = fread($this->fp, 8192);
